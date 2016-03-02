@@ -114,6 +114,9 @@
     self.viewModel.cvc = @"3192";
     self.viewModel.zipcode = @"A1B 2D0";
     XCTAssertTrue([self.viewModel isValid]);
+
+    self.viewModel.cvc = @"123";
+    XCTAssertFalse([self.viewModel isValid]);
 }
 
 @end

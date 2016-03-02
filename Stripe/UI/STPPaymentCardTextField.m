@@ -117,10 +117,15 @@ CGFloat const STPPaymentCardTextFieldDefaultPadding = 10;
     self.zipcodeField = zipcodeField;
     self.zipcodePlaceholder = @"ZIPCODE";
 
-//    self.cvcField.backgroundColor = [UIColor purpleColor];
-//    self.expirationField.backgroundColor = [UIColor redColor];
 //    self.numberField.backgroundColor = [UIColor yellowColor];
+//    self.expirationField.backgroundColor = [UIColor redColor];
+//    self.cvcField.backgroundColor = [UIColor purpleColor];
 //    self.zipcodeField.backgroundColor = [UIColor blueColor];
+
+//    self.numberField.text = @"378282246310005";
+//    self.expirationField.text = @"12/18";
+//    self.cvcField.text = @"4928";
+//    self.zipcodeField.text = @"31291";
 
     UIView *fieldsView = [[UIView alloc] init];
     fieldsView.clipsToBounds = YES;
@@ -170,7 +175,7 @@ CGFloat const STPPaymentCardTextFieldDefaultPadding = 10;
 }
 
 - (UIFont *)font {
-    return _font ?: [UIFont systemFontOfSize:18];
+    return _font ?: [UIFont systemFontOfSize:16];
 }
 
 - (void)setTextColor:(UIColor *)textColor {
