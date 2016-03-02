@@ -108,4 +108,12 @@
     XCTAssertFalse([self.viewModel isValid]);
 }
 
+- (void)testValidityForAMEX {
+    self.viewModel.cardNumber = @"378282246310005";
+    self.viewModel.rawExpiration = @"03/18";
+    self.viewModel.cvc = @"3192";
+    self.viewModel.zipcode = @"A1B 2D0";
+    XCTAssertTrue([self.viewModel isValid]);
+}
+
 @end
