@@ -102,12 +102,14 @@ CGFloat const STPPaymentCardTextFieldDefaultPadding = 10;
     expirationField.tag = STPCardFieldTypeExpiration;
     expirationField.alpha = 0;
     self.expirationField = expirationField;
+    self.expirationField.font = [UIFont systemFontOfSize:13];
     self.expirationPlaceholder = @"MM/YY";
 
     STPFormTextField *cvcField = [self buildTextField];
     cvcField.tag = STPCardFieldTypeCVC;
     cvcField.alpha = 0;
     self.cvcField = cvcField;
+    self.cvcField.font = [UIFont systemFontOfSize:13];
     self.cvcPlaceholder = @"CVC";
 
     STPFormTextField *zipcodeField = [self buildTextField];
@@ -115,6 +117,7 @@ CGFloat const STPPaymentCardTextFieldDefaultPadding = 10;
     zipcodeField.alpha = 0;
     zipcodeField.keyboardType = UIKeyboardTypeDefault;
     self.zipcodeField = zipcodeField;
+    self.zipcodeField.font = [UIFont systemFontOfSize:13];
     self.zipcodePlaceholder = @"ZIPCODE";
 
 //    self.numberField.backgroundColor = [UIColor yellowColor];
@@ -484,7 +487,7 @@ CGFloat const STPPaymentCardTextFieldDefaultPadding = 10;
     CGFloat zipcodeX = self.numberFieldShrunk ?
             CGRectGetWidth(fieldsRect) - zipcodeWidth - STPPaymentCardTextFieldDefaultPadding / 2  :
             CGRectGetWidth(fieldsRect);
-    return CGRectMake(zipcodeX, 0, zipcodeWidth, CGRectGetHeight(bounds));
+    return CGRectMake(zipcodeX + STPPaymentCardTextFieldDefaultPadding, 0, zipcodeWidth, CGRectGetHeight(bounds));
 }
 
 - (CGFloat)paddingForExpirationAndCVC: (CGRect)bounds {
@@ -511,7 +514,7 @@ CGFloat const STPPaymentCardTextFieldDefaultPadding = 10;
 - (CGRect)expirationFieldRectForBounds:(CGRect)bounds {
     CGRect numberFieldRect = [self numberFieldRectForBounds:bounds];
     CGFloat expirationX = CGRectGetMaxX(numberFieldRect) + [self paddingForExpirationAndCVC:bounds];
-    return CGRectMake(expirationX, 0, [self expirationWidth], CGRectGetHeight(bounds));
+    return CGRectMake(expirationX + STPPaymentCardTextFieldDefaultPadding, 0, [self expirationWidth], CGRectGetHeight(bounds));
 }
 
 - (void)layoutSubviews {
