@@ -367,20 +367,20 @@ CGFloat const STPPaymentCardTextFieldDefaultPadding = 13;
 }
 
 - (STPFormTextField *)nextField {
-    if (self.selectedField == self.numberField) {
+    if (self.currentFirstResponderField == self.numberField) {
         return self.expirationField;
-    } else if (self.selectedField == self.expirationField) {
+    } else if (self.currentFirstResponderField == self.expirationField) {
         return self.cvcField;
-    } else if (self.selectedField == self.cvcField) {
+    } else if (self.currentFirstResponderField == self.cvcField) {
         return self.zipcodeField;
     }
     return nil;
 }
 
 - (STPFormTextField *)previousField {
-    if (self.selectedField == self.zipcodeField) {
+    if (self.currentFirstResponderField == self.zipcodeField) {
         return self.cvcField;
-    } else if (self.selectedField == self.cvcField) {
+    } else if (self.currentFirstResponderField == self.cvcField) {
         return self.expirationField;
     } else if (self.currentFirstResponderField == self.expirationField) {
         return self.numberField;
@@ -488,7 +488,7 @@ CGFloat const STPPaymentCardTextFieldDefaultPadding = 13;
     }
 }
 
-- (STPCardParams *)card {
+- (STPCardParams *)cardParams {
     if (!self.isValid) { return nil; }
     return self.cardParams;
 }
@@ -764,7 +764,7 @@ typedef void (^STPNumberShrunkCompletionBlock)(BOOL completed);
 }
 
 - (void)textFieldDidEndEditing:(__unused UITextField *)textField {
-    self.selectedField = nil;
+    self.currentFirstResponderField = nil;
 }
 
 - (BOOL)textField:(STPFormTextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
