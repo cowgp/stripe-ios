@@ -617,7 +617,20 @@ CGFloat const STPPaymentCardTextFieldDefaultPadding = 13;
 }
 
 - (NSArray *)allFields {
-    return @[self.numberField, self.expirationField, self.cvcField, self.zipcodeField];
+    NSMutableArray *mutable = [NSMutableArray array];
+        if (self.numberField) {
+            [mutable addObject:self.numberField];
+        }
+        if (self.expirationField) {
+            [mutable addObject:self.expirationField];
+        }
+        if (self.cvcField) {
+            [mutable addObject:self.cvcField];
+        }
+        if (self.zipcodeField) {
+            [mutable addObject:self.cvcField];
+        }
+    return [mutable copy];
 }
 
 typedef void (^STPNumberShrunkCompletionBlock)(BOOL completed);
