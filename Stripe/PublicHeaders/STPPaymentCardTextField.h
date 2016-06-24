@@ -55,6 +55,11 @@
 - (void)paymentCardTextFieldDidBeginEditingExpiration:(nonnull STPPaymentCardTextField *)textField;
 
 /**
+ *  Called when editing ends in the payment card field's expiration field.
+ */
+- (void)paymentCardTextFieldDidEndEditingExpiration:(nonnull STPPaymentCardTextField *)textField;
+
+/**
  *  Called when editing begins in the payment card field's zipcode field.
  */
 - (void)paymentCardTextFieldDidBeginEditingZipcode:(nonnull STPPaymentCardTextField *)textField;

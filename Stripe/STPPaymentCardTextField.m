@@ -763,8 +763,24 @@ typedef void (^STPNumberShrunkCompletionBlock)(BOOL completed);
     return YES;
 }
 
-- (void)textFieldDidEndEditing:(__unused UITextField *)textField {
-    self.currentFirstResponderField = nil;
+- (void)textFieldDidEndEditing:(UITextField *)textField {
+    switch ((STPCardFieldType)textField.tag) {
+        case STPCardFieldTypeNumber:
+            if ([self.delegate respondsToSelector:@selector(paymentCardTextFieldDidEndEditingNumber:)]) {
+                [self.delegate paymentCardTextFieldDidEndEditingNumber:self];
+            }
+            break;
+        case STPCardFieldTypeCVC:
+            if ([self.delegate respondsToSelector:@selector(paymentCardTextFieldDidEndEditingCVC:)]) {
+                [self.delegate paymentCardTextFieldDidEndEditingCVC:self];
+            }
+            break;
+        case STPCardFieldTypeExpiration:
+            if ([self.delegate respondsToSelector:@selector(paymentCardTextFieldDidEndEditingExpiration:)]) {
+                [self.delegate paymentCardTextFieldDidEndEditingExpiration:self];
+            }
+            break;
+    }
 }
 
 - (BOOL)textField:(STPFormTextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
