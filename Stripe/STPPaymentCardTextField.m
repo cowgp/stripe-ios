@@ -628,7 +628,7 @@ CGFloat const STPPaymentCardTextFieldDefaultPadding = 13;
             [mutable addObject:self.cvcField];
         }
         if (self.zipcodeField) {
-            [mutable addObject:self.cvcField];
+            [mutable addObject:self.zipcodeField];
         }
     return [mutable copy];
 }
