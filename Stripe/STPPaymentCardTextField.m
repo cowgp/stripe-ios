@@ -30,6 +30,8 @@
 
 @property(nonatomic, readwrite, weak)STPFormTextField *cvcField;
 
+@property(nonatomic, readwrite, weak)STPFormTextField *zipcodeField;
+
 @property(nonatomic, readwrite, strong)STPPaymentCardTextFieldViewModel *viewModel;
 
 @property(nonatomic, readonly, weak)UITextField *currentFirstResponderField;
@@ -73,13 +75,13 @@ CGFloat const STPPaymentCardTextFieldDefaultPadding = 13;
 }
 
 - (void)commonInit {
-    
+
     self.borderColor = [self.class placeholderGrayColor];
     self.cornerRadius = 5.0f;
     self.borderWidth = 1.0f;
 
     self.clipsToBounds = YES;
-    
+
     _viewModel = [STPPaymentCardTextFieldViewModel new];
     _sizingField = [self buildTextField];
     _sizingField.formDelegate = nil;
@@ -91,7 +93,7 @@ CGFloat const STPPaymentCardTextFieldDefaultPadding = 13;
         brandImageView.tintColor = self.placeholderColor;
     }
     self.brandImageView = brandImageView;
-    
+
     STPFormTextField *numberField = [self buildTextField];
     numberField.autoFormattingBehavior = STPFormTextFieldAutoFormattingBehaviorCardNumbers;
     numberField.tag = STPCardFieldTypeNumber;
@@ -103,23 +105,34 @@ CGFloat const STPPaymentCardTextFieldDefaultPadding = 13;
     expirationField.tag = STPCardFieldTypeExpiration;
     expirationField.alpha = 0;
     self.expirationField = expirationField;
+    self.expirationField.font = [UIFont systemFontOfSize:13];
     self.expirationPlaceholder = @"MM/YY";
-        
+
     STPFormTextField *cvcField = [self buildTextField];
     cvcField.tag = STPCardFieldTypeCVC;
     cvcField.alpha = 0;
     self.cvcField = cvcField;
+    self.cvcField.font = [UIFont systemFontOfSize:13];
     self.cvcPlaceholder = @"CVC";
-    
+
+    STPFormTextField *zipcodeField = [self buildTextField];
+    zipcodeField.tag = STPCardFieldTypeZipcode;
+    zipcodeField.alpha = 0;
+    zipcodeField.keyboardType = UIKeyboardTypeDefault;
+    self.zipcodeField = zipcodeField;
+    self.zipcodeField.font = [UIFont systemFontOfSize:13];
+    self.zipcodePlaceholder = @"ZIPCODE";
+
     UIView *fieldsView = [[UIView alloc] init];
     fieldsView.clipsToBounds = YES;
     fieldsView.backgroundColor = [UIColor clearColor];
     self.fieldsView = fieldsView;
-    
+
     [self addSubview:self.fieldsView];
     [self.fieldsView addSubview:cvcField];
     [self.fieldsView addSubview:expirationField];
     [self.fieldsView addSubview:numberField];
+    [self.fieldsView addSubview:zipcodeField];
     [self addSubview:brandImageView];
 }
 
@@ -147,23 +160,23 @@ CGFloat const STPPaymentCardTextFieldDefaultPadding = 13;
 
 - (void)setFont:(UIFont *)font {
     _font = [font copy];
-    
+
     for (UITextField *field in [self allFields]) {
         field.font = _font;
     }
-    
+
     self.sizingField.font = _font;
-    
+
     [self setNeedsLayout];
 }
 
 - (UIFont *)font {
-    return _font ?: [UIFont systemFontOfSize:18];
+    return _font ?: [UIFont systemFontOfSize:16];
 }
 
 - (void)setTextColor:(UIColor *)textColor {
     _textColor = [textColor copy];
-    
+
     for (STPFormTextField *field in [self allFields]) {
         field.defaultColor = _textColor;
     }
@@ -196,7 +209,7 @@ CGFloat const STPPaymentCardTextFieldDefaultPadding = 13;
 
 - (void)setTextErrorColor:(UIColor *)textErrorColor {
     _textErrorColor = [textErrorColor copy];
-    
+
     for (STPFormTextField *field in [self allFields]) {
         field.errorColor = _textErrorColor;
     }
@@ -208,11 +221,11 @@ CGFloat const STPPaymentCardTextFieldDefaultPadding = 13;
 
 - (void)setPlaceholderColor:(UIColor *)placeholderColor {
     _placeholderColor = [placeholderColor copy];
-    
+
     if ([self.brandImageView respondsToSelector:@selector(setTintColor:)]) {
         self.brandImageView.tintColor = placeholderColor;
     }
-    
+
     for (STPFormTextField *field in [self allFields]) {
         field.placeholderColor = _placeholderColor;
     }
@@ -235,6 +248,11 @@ CGFloat const STPPaymentCardTextFieldDefaultPadding = 13;
 - (void)setCvcPlaceholder:(NSString * __nullable)cvcPlaceholder {
     _cvcPlaceholder = [cvcPlaceholder copy];
     self.cvcField.placeholder = _cvcPlaceholder;
+}
+
+- (void)setZipcodePlaceholder:(NSString * __nullable)zipcodePlaceholder {
+    _zipcodePlaceholder = [zipcodePlaceholder copy];
+    self.zipcodeField.placeholder = _zipcodePlaceholder;
 }
 
 - (void)setCursorColor:(UIColor *)cursorColor {
@@ -278,7 +296,7 @@ CGFloat const STPPaymentCardTextFieldDefaultPadding = 13;
 
 - (void)setInputAccessoryView:(UIView *)inputAccessoryView {
     _inputAccessoryView = inputAccessoryView;
-    
+
     for (STPFormTextField *field in [self allFields]) {
         field.inputAccessoryView = inputAccessoryView;
     }
@@ -312,8 +330,10 @@ CGFloat const STPPaymentCardTextFieldDefaultPadding = 13;
         return self.numberField;
     } else if ([self.viewModel validationStateForField:STPCardFieldTypeExpiration] != STPCardValidationStateValid) {
         return self.expirationField;
-    } else {
+    } else if ([self.viewModel validationStateForField:STPCardFieldTypeCVC] != STPCardValidationStateValid) {
         return self.cvcField;
+    } else {
+        return self.zipcodeField;
     }
 }
 
@@ -338,8 +358,29 @@ CGFloat const STPPaymentCardTextFieldDefaultPadding = 13;
     return success;
 }
 
+- (BOOL)selectNextField {
+    return [[self nextField] becomeFirstResponder];
+}
+
+- (BOOL)selectPreviousField {
+    return [[self previousField] becomeFirstResponder];
+}
+
+- (STPFormTextField *)nextField {
+    if (self.selectedField == self.numberField) {
+        return self.expirationField;
+    } else if (self.selectedField == self.expirationField) {
+        return self.cvcField;
+    } else if (self.selectedField == self.cvcField) {
+        return self.zipcodeField;
+    }
+    return nil;
+}
+
 - (STPFormTextField *)previousField {
-    if (self.currentFirstResponderField == self.cvcField) {
+    if (self.selectedField == self.zipcodeField) {
+        return self.cvcField;
+    } else if (self.selectedField == self.cvcField) {
         return self.expirationField;
     } else if (self.currentFirstResponderField == self.expirationField) {
         return self.numberField;
@@ -399,12 +440,19 @@ CGFloat const STPPaymentCardTextFieldDefaultPadding = 13;
     return self.viewModel.cvc;
 }
 
-- (STPCardParams *)cardParams {
+- (NSString *)zipcode {
+    return self.viewModel.zipcode;
+}
+
+- (STPCardParams *)card {
+    if (!self.isValid) { return nil; }
+
     STPCardParams *c = [[STPCardParams alloc] init];
     c.number = self.cardNumber;
     c.expMonth = self.expirationMonth;
     c.expYear = self.expirationYear;
     c.cvc = self.cvc;
+    c.addressZip = self.zipcode;
     return c;
 }
 
@@ -467,16 +515,16 @@ CGFloat const STPPaymentCardTextFieldDefaultPadding = 13;
 }
 
 - (CGSize)intrinsicContentSize {
-    
+
     CGSize imageSize = self.brandImage.size;
-    
+
     self.sizingField.text = self.viewModel.defaultPlaceholder;
     CGFloat textHeight = [self.sizingField measureTextSize].height;
     CGFloat imageHeight = imageSize.height + (STPPaymentCardTextFieldDefaultPadding);
     CGFloat height = stp_roundCGFloat((MAX(MAX(imageHeight, textHeight), 44)));
-    
+
     CGFloat width = stp_roundCGFloat([self widthForCardNumber:self.viewModel.defaultPlaceholder] + imageSize.width + (STPPaymentCardTextFieldDefaultPadding * 3));
-    
+
     return CGSizeMake(width, height);
 }
 
@@ -493,28 +541,51 @@ CGFloat const STPPaymentCardTextFieldDefaultPadding = 13;
     CGFloat placeholderWidth = [self widthForCardNumber:self.numberField.placeholder] - 4;
     CGFloat numberWidth = [self widthForCardNumber:self.viewModel.defaultPlaceholder] - 4;
     CGFloat numberFieldWidth = MAX(placeholderWidth, numberWidth);
-    CGFloat nonFragmentWidth = [self widthForCardNumber:[self.viewModel numberWithoutLastDigits]] - 12;
+    CGFloat nonFragmentWidth = [self widthForCardNumber:[self.viewModel numberWithoutLastDigits]] - 8;
+    if (self.viewModel.brand == STPCardBrandAmex) {
+        // AMEX cards have 1 less whitespace, so can have less length
+        numberFieldWidth -= 16;
+    }
+
     CGFloat numberFieldX = self.numberFieldShrunk ? STPPaymentCardTextFieldDefaultPadding - nonFragmentWidth : 8;
     return CGRectMake(numberFieldX, 0, numberFieldWidth, CGRectGetHeight(bounds));
 }
 
-- (CGRect)cvcFieldRectForBounds:(CGRect)bounds {
+- (CGRect)zipcodeFieldRectForBounds:(CGRect)bounds {
     CGRect fieldsRect = [self fieldsRectForBounds:bounds];
 
-    CGFloat cvcWidth = MAX([self widthForText:self.cvcField.placeholder], [self widthForText:@"8888"]);
-    CGFloat cvcX = self.numberFieldShrunk ?
-    CGRectGetWidth(fieldsRect) - cvcWidth - STPPaymentCardTextFieldDefaultPadding / 2  :
-    CGRectGetWidth(fieldsRect);
-    return CGRectMake(cvcX, 0, cvcWidth, CGRectGetHeight(bounds));
+    CGFloat zipcodeWidth = MAX([self widthForText:self.zipcodeField.placeholder], [self widthForText:@"A1B-2C3"]);
+    CGFloat zipcodeX = self.numberFieldShrunk ?
+            CGRectGetWidth(fieldsRect) - zipcodeWidth - STPPaymentCardTextFieldDefaultPadding / 2  :
+            CGRectGetWidth(fieldsRect);
+    return CGRectMake(zipcodeX + STPPaymentCardTextFieldDefaultPadding, 0, zipcodeWidth, CGRectGetHeight(bounds));
+}
+
+- (CGFloat)paddingForExpirationAndCVC: (CGRect)bounds {
+    CGRect numberFieldRect = [self numberFieldRectForBounds:bounds];
+    CGRect zipcodeFieldRect = [self zipcodeFieldRectForBounds:bounds];
+    CGFloat totalLength = CGRectGetMinX(zipcodeFieldRect) - CGRectGetMaxX(numberFieldRect);
+    return MAX(0, (totalLength - [self expirationWidth] - [self cvcWidth]) / 3.0);
+}
+
+- (CGFloat)cvcWidth {
+    return MAX([self widthForText:self.cvcField.placeholder], [self widthForText:@"8888"]);
+}
+
+- (CGFloat)expirationWidth {
+    return MAX([self widthForText:self.expirationField.placeholder], [self widthForText:@"88/88"]) - 6;
+}
+
+- (CGRect)cvcFieldRectForBounds:(CGRect)bounds {
+    CGRect expirationFieldRect = [self expirationFieldRectForBounds:bounds];
+    CGFloat cvcX = CGRectGetMaxX(expirationFieldRect) + [self paddingForExpirationAndCVC:bounds];
+    return CGRectMake(cvcX, 0, [self cvcWidth], CGRectGetHeight(bounds));
 }
 
 - (CGRect)expirationFieldRectForBounds:(CGRect)bounds {
     CGRect numberFieldRect = [self numberFieldRectForBounds:bounds];
-    CGRect cvcRect = [self cvcFieldRectForBounds:bounds];
-
-    CGFloat expirationWidth = MAX([self widthForText:self.expirationField.placeholder], [self widthForText:@"88/88"]);
-    CGFloat expirationX = (CGRectGetMaxX(numberFieldRect) + CGRectGetMinX(cvcRect) - expirationWidth) / 2;
-    return CGRectMake(expirationX, 0, expirationWidth, CGRectGetHeight(bounds));
+    CGFloat expirationX = CGRectGetMaxX(numberFieldRect) + [self paddingForExpirationAndCVC:bounds];
+    return CGRectMake(expirationX + STPPaymentCardTextFieldDefaultPadding, 0, [self expirationWidth], CGRectGetHeight(bounds));
 }
 
 - (void)layoutSubviews {
@@ -527,7 +598,7 @@ CGFloat const STPPaymentCardTextFieldDefaultPadding = 13;
     self.numberField.frame = [self numberFieldRectForBounds:bounds];
     self.cvcField.frame = [self cvcFieldRectForBounds:bounds];
     self.expirationField.frame = [self expirationFieldRectForBounds:bounds];
-    
+    self.zipcodeField.frame = [self zipcodeFieldRectForBounds:bounds];
 }
 
 #pragma mark - private helper methods
@@ -546,38 +617,28 @@ CGFloat const STPPaymentCardTextFieldDefaultPadding = 13;
 }
 
 - (NSArray *)allFields {
-    NSMutableArray *mutable = [NSMutableArray array];
-    if (self.numberField) {
-        [mutable addObject:self.numberField];
-    }
-    if (self.expirationField) {
-        [mutable addObject:self.expirationField];
-    }
-    if (self.cvcField) {
-        [mutable addObject:self.cvcField];
-    }
-    return [mutable copy];
+    return @[self.numberField, self.expirationField, self.cvcField, self.zipcodeField];
 }
 
 typedef void (^STPNumberShrunkCompletionBlock)(BOOL completed);
 - (void)setNumberFieldShrunk:(BOOL)shrunk animated:(BOOL)animated
                   completion:(STPNumberShrunkCompletionBlock)completion {
-    
+
     if (_numberFieldShrunk == shrunk) {
         if (completion) {
             completion(YES);
         }
         return;
     }
-    
+
     _numberFieldShrunk = shrunk;
     void (^animations)() = ^void() {
-        for (UIView *view in @[self.expirationField, self.cvcField]) {
+        for (UIView *view in @[self.expirationField, self.cvcField, self.zipcodeField]) {
             view.alpha = 1.0f * shrunk;
         }
         [self layoutSubviews];
     };
-    
+
     FAUXPAS_IGNORED_IN_METHOD(APIAvailability);
     NSTimeInterval duration = animated * 0.3;
     if ([UIView respondsToSelector:@selector(animateWithDuration:delay:usingSpringWithDamping:initialSpringVelocity:options:animations:completion:)]) {
@@ -688,6 +749,11 @@ typedef void (^STPNumberShrunkCompletionBlock)(BOOL completed);
                 [self.delegate paymentCardTextFieldDidBeginEditingExpiration:self];
             }
             break;
+        case STPCardFieldTypeZipcode:
+            [self setNumberFieldShrunk:YES animated:YES completion:nil];
+            if ([self.delegate respondsToSelector:@selector(paymentCardTextFieldDidBeginEditingZipcode:)]) {
+                [self.delegate paymentCardTextFieldDidBeginEditingZipcode:self];
+            }
     }
     [self updateImageForFieldType:textField.tag];
 }
@@ -697,22 +763,51 @@ typedef void (^STPNumberShrunkCompletionBlock)(BOOL completed);
     return YES;
 }
 
-- (void)textFieldDidEndEditing:(UITextField *)textField {
-    switch ((STPCardFieldType)textField.tag) {
+- (void)textFieldDidEndEditing:(__unused UITextField *)textField {
+    self.selectedField = nil;
+}
+
+- (BOOL)textField:(STPFormTextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string {
+
+    BOOL deletingLastCharacter = (range.location == textField.text.length - 1 && range.length == 1 && [string isEqualToString:@""]);
+    if (deletingLastCharacter && [textField.text hasSuffix:@"/"] && range.location > 0) {
+        range.location -= 1;
+        range.length += 1;
+    }
+
+    NSString *newText = [textField.text stringByReplacingCharactersInRange:range withString:string];
+    STPCardFieldType fieldType = textField.tag;
+    switch (fieldType) {
         case STPCardFieldTypeNumber:
-            if ([self.delegate respondsToSelector:@selector(paymentCardTextFieldDidEndEditingNumber:)]) {
-                [self.delegate paymentCardTextFieldDidEndEditingNumber:self];
-            }
+            self.viewModel.cardNumber = newText;
+            textField.text = self.viewModel.cardNumber;
             break;
+        case STPCardFieldTypeExpiration: {
+             self.viewModel.rawExpiration = newText;
+             textField.text = self.viewModel.rawExpiration;
+             break;
+         }
         case STPCardFieldTypeCVC:
-            if ([self.delegate respondsToSelector:@selector(paymentCardTextFieldDidEndEditingCVC:)]) {
-                [self.delegate paymentCardTextFieldDidEndEditingCVC:self];
-            }
+            self.viewModel.cvc = newText;
+            textField.text = self.viewModel.cvc;
             break;
-        case STPCardFieldTypeExpiration:
-            if ([self.delegate respondsToSelector:@selector(paymentCardTextFieldDidEndEditingExpiration:)]) {
-                [self.delegate paymentCardTextFieldDidEndEditingExpiration:self];
-            }
+        case STPCardFieldTypeZipcode:
+            self.viewModel.zipcode = newText;
+            textField.text = self.viewModel.zipcode;
+            break;
+    }
+    [self updateImageForFieldType:fieldType];
+
+    STPCardValidationState state = [self.viewModel validationStateForField:fieldType];
+    textField.validText = YES;
+    switch (state) {
+        case STPCardValidationStateInvalid:
+            textField.validText = NO;
+            break;
+        case STPCardValidationStateIncomplete:
+            break;
+        case STPCardValidationStateValid:
+            [self selectNextField];
             break;
     }
 }
@@ -745,12 +840,12 @@ typedef void (^STPNumberShrunkCompletionBlock)(BOOL completed);
     UIImage *image = [self brandImageForFieldType:fieldType];
     if (image != self.brandImageView.image) {
         self.brandImageView.image = image;
-        
+
         CATransition *transition = [CATransition animation];
         transition.duration = 0.2f;
         transition.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
         transition.type = kCATransitionFade;
-        
+
         [self.brandImageView.layer addAnimation:transition forKey:nil];
 
         [self setNeedsLayout];

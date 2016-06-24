@@ -89,9 +89,33 @@
     self.viewModel.cardNumber = @"4242424242424242";
     self.viewModel.rawExpiration = @"12/24";
     self.viewModel.cvc = @"123";
+    self.viewModel.zipcode = @"32312";
     XCTAssertTrue([self.viewModel isValid]);
-    
+
+    self.viewModel.zipcode = @"A1B2C3";
+    XCTAssertTrue([self.viewModel isValid]);
+
+    self.viewModel.zipcode = @"A1B-2C3";
+    XCTAssertTrue([self.viewModel isValid]);
+
+    self.viewModel.zipcode = @"323123";
+    XCTAssertTrue([self.viewModel isValid]);
+
+    self.viewModel.zipcode = @"A1B 2C3";
+    XCTAssertTrue([self.viewModel isValid]);
+
     self.viewModel.cvc = @"12";
+    XCTAssertFalse([self.viewModel isValid]);
+}
+
+- (void)testValidityForAMEX {
+    self.viewModel.cardNumber = @"378282246310005";
+    self.viewModel.rawExpiration = @"03/18";
+    self.viewModel.cvc = @"3192";
+    self.viewModel.zipcode = @"A1B 2D0";
+    XCTAssertTrue([self.viewModel isValid]);
+
+    self.viewModel.cvc = @"123";
     XCTAssertFalse([self.viewModel isValid]);
 }
 

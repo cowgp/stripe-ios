@@ -55,9 +55,9 @@
 - (void)paymentCardTextFieldDidBeginEditingExpiration:(nonnull STPPaymentCardTextField *)textField;
 
 /**
- *  Called when editing ends in the payment card field's expiration field.
+ *  Called when editing begins in the payment card field's zipcode field.
  */
-- (void)paymentCardTextFieldDidEndEditingExpiration:(nonnull STPPaymentCardTextField *)textField;
+- (void)paymentCardTextFieldDidBeginEditingZipcode:(nonnull STPPaymentCardTextField *)textField;
 
 @end
 
@@ -106,6 +106,12 @@
  *  The placeholder for the cvc field. Defaults to @"CVC".
  */
 @property(nonatomic, copy, nullable) NSString *cvcPlaceholder;
+
+
+/**
+ *  The placeholder for the zipcode field. Defaults to @"ZIP".
+ */
+@property(nonatomic, copy, nullable) NSString *zipcodePlaceholder;
 
 /**
  *  The cursor color for the field. This is a proxy for the view's tintColor property, exposed for clarity only (in other words, calling setCursorColor is identical to calling setTintColor).
@@ -257,10 +263,13 @@
 @property(nonatomic, readonly, nullable) NSString *cvc;
 
 /**
- *  Convenience property for creating an STPCardParams from the currently entered information
- *  or programmatically setting the field's contents. For example, if you're using another library
- *  to scan your user's credit card with a camera, you can assemble that data into an STPCardParams
- *  object and set this property to that object to prefill the fields you've collected.
+ *  The current zipcode displayed by the field.  May or may not be valid, unless isValid is true, in which case it is guaranteed to be valid.
+ */
+@property(nonatomic, readonly, nullable) NSString *zipcode;
+
+/**
+ *  Convenience method to create a STPCard from the currently entered information. Will return nil if not valid.
+>>>>>>> caloriecloud/seansu4you87/zipcode:Stripe/PublicHeaders/UI/STPPaymentCardTextField.h
  */
 @property(nonatomic, readwrite, nonnull) STPCardParams *cardParams;
 

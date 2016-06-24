@@ -209,7 +209,7 @@
                        @[@"12", @(STPCardBrandVisa), @(STPCardValidationStateIncomplete)],
                        @[@"1x3", @(STPCardBrandVisa), @(STPCardValidationStateInvalid)],
                        @[@"123", @(STPCardBrandVisa), @(STPCardValidationStateValid)],
-                       @[@"123", @(STPCardBrandAmex), @(STPCardValidationStateValid)],
+                       @[@"123", @(STPCardBrandAmex), @(STPCardValidationStateIncomplete)],
                        @[@"123", @(STPCardBrandUnknown), @(STPCardValidationStateValid)],
                        @[@"1234", @(STPCardBrandVisa), @(STPCardValidationStateInvalid)],
                        @[@"1234", @(STPCardBrandAmex), @(STPCardValidationStateValid)],
@@ -231,7 +231,7 @@
                        @[@"4242424242424242", @(21), @(15), @"123", @(STPCardValidationStateInvalid)],
                        @[@"42424242", @(12), @(15), @"123", @(STPCardValidationStateIncomplete)],
                        @[@"378282246310005", @(12), @(15), @"1234", @(STPCardValidationStateValid)],
-                       @[@"378282246310005", @(12), @(15), @"123", @(STPCardValidationStateValid)],
+                       @[@"378282246310005", @(12), @(15), @"123", @(STPCardValidationStateIncomplete)],
                        @[@"378282246310005", @(12), @(15), @"12345", @(STPCardValidationStateInvalid)],
                        @[@"1234567812345678", @(12), @(15), @"12345", @(STPCardValidationStateInvalid)],
                        ];
