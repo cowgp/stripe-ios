@@ -488,7 +488,7 @@ CGFloat const STPPaymentCardTextFieldDefaultPadding = 13;
     }
 }
 
-- (STPCardParams *)cardParams {
+- (STPCardParams *)card {
     if (!self.isValid) { return nil; }
     return self.cardParams;
 }
