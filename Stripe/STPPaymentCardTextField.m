@@ -707,6 +707,9 @@ typedef void (^STPNumberShrunkCompletionBlock)(BOOL completed);
         case STPCardFieldTypeCVC:
             self.viewModel.cvc = input.string;
             break;
+        case STPCardFieldTypeZipcode:
+            self.viewModel.zipcode = input.string;
+            break;
     }
     
     switch (fieldType) {
@@ -716,7 +719,8 @@ typedef void (^STPNumberShrunkCompletionBlock)(BOOL completed);
             return [[NSAttributedString alloc] initWithString:self.viewModel.rawExpiration];
         case STPCardFieldTypeCVC:
             return [[NSAttributedString alloc] initWithString:self.viewModel.cvc];
-    }
+        case STPCardFieldTypeZipcode:
+            return [[NSAttributedString alloc] initWithString:self.viewModel.zipcode];}
 }
 
 - (void)formTextFieldTextDidChange:(STPFormTextField *)formTextField {
