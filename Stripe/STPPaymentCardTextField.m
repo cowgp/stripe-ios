@@ -444,9 +444,7 @@ CGFloat const STPPaymentCardTextFieldDefaultPadding = 13;
     return self.viewModel.zipcode;
 }
 
-- (STPCardParams *)card {
-    if (!self.isValid) { return nil; }
-
+- (STPCardParams *)cardParams {
     STPCardParams *c = [[STPCardParams alloc] init];
     c.number = self.cardNumber;
     c.expMonth = self.expirationMonth;
