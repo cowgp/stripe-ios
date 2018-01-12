@@ -841,6 +841,7 @@ typedef void (^STPNumberShrunkCompletionBlock)(BOOL completed);
             [self selectNextField];
             break;
     }
+    return NO;
 }
 
 - (UIImage *)brandImage {
